@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const employeeSchema = new mongoose.Schema({
   firstname: {
@@ -35,6 +36,15 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+});
+
+employeeSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 10);
+
+    this.confirmpassword = undefined;
+  }
+  next();
 });
 
 const Register = new mongoose.model("Register", employeeSchema);
